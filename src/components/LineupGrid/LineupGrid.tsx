@@ -6,8 +6,9 @@ import {
   setFormation,
   formations,
   assignPlayerToSlot,
+  removePlayerFromSlot,
 } from "../../store/lineupSlice";
-import { useDrop } from "react-dnd";
+import { useDrop, useDrag } from "react-dnd";
 
 export default function LineupGrid() {
   const dispatch = useDispatch();
@@ -40,7 +41,6 @@ export default function LineupGrid() {
         className="p-6 rounded shadow w-full h-full"
         style={{
           background: "linear-gradient(135deg, #228B22 80%, #006400 100%)",
-          //   minHeight: 500,
           width: "100%",
           height: "60%",
           display: "grid",
@@ -73,9 +73,16 @@ type SlotProps = {
 };
 
 function Slot({ slot, player, dispatch }: SlotProps) {
+  // Drop functionality for receiving players
   const [{ isOver, canDrop }, drop] = useDrop({
     accept: "PLAYER",
-    drop: (item: { id: string }) => {
+    drop: (item: { id: string; fromSlot?: string }) => {
+      if (item.fromSlot) {
+        // Player is being moved from another grid slot
+        // First remove from old slot
+        dispatch(removePlayerFromSlot({ slotId: item.fromSlot }));
+      }
+      // Then assign to new slot
       dispatch(assignPlayerToSlot({ slotId: slot.id, playerId: item.id }));
     },
     canDrop: () => !player, // Only allow drop if slot is empty
@@ -85,9 +92,25 @@ function Slot({ slot, player, dispatch }: SlotProps) {
     }),
   });
 
+  // Drag functionality for assigned players
+  const [{ isDragging }, drag] = useDrag({
+    type: "PLAYER",
+    item: player ? { id: player.id, fromSlot: slot.id } : null,
+    canDrag: () => !!player, // Only allow drag if player exists
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+
+  // Combine drag and drop refs
+  const dragDropRef = (node: HTMLDivElement | null) => {
+    drag(node);
+    drop(node);
+  };
+
   return (
     <div
-      ref={drop}
+      ref={dragDropRef}
       style={{
         gridRow: 4 - slot.y,
         gridColumn: slot.x + 1,
@@ -102,11 +125,13 @@ function Slot({ slot, player, dispatch }: SlotProps) {
         boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
         border: isOver && canDrop ? "2px solid #22c55e" : undefined,
         transition: "background 0.2s, border 0.2s",
+        opacity: isDragging ? 0.5 : 1,
+        cursor: player ? "grab" : "default",
       }}
     >
       <div className="text-xs text-gray-500 mb-1">{slot.position}</div>
       {player ? (
-        <div className="font-semibold">
+        <div className="font-semibold text-center">
           {player.name} #{player.number}
         </div>
       ) : (

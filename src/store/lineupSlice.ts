@@ -83,9 +83,9 @@ const initialState: LineupState = {
     { id: "p7", name: "Rodri", position: "Midfielder", number: 16 },
     { id: "p8", name: "Kevin De Bruyne", position: "Midfielder", number: 17 },
     { id: "p9", name: "Phil Foden", position: "Midfielder", number: 47 },
+    { id: "p12", name: "Erling Haaland", position: "Forward", number: 9 },
     { id: "p10", name: "Bernardo Silva", position: "Midfielder", number: 20 },
     { id: "p11", name: "Julián Álvarez", position: "Forward", number: 19 },
-    { id: "p12", name: "Erling Haaland", position: "Forward", number: 9 },
     { id: "p13", name: "Jack Grealish", position: "Midfielder", number: 10 },
     { id: "p14", name: "Matheus Nunes", position: "Midfielder", number: 27 },
     { id: "p15", name: "Mateo Kovačić", position: "Midfielder", number: 8 },
@@ -102,6 +102,8 @@ const initialState: LineupState = {
     assignedPlayerId: undefined,
   })),
 };
+
+console.log(initialState);
 
 export const lineupSlice = createSlice({
   name: "lineup",
@@ -134,9 +136,69 @@ export const lineupSlice = createSlice({
         assignedPlayerId: undefined,
       }));
     },
+    loadLineup(state, action: PayloadAction<GridSlot[]>) {
+      state.grid = action.payload;
+    },
+    autoAssign(state) {
+      // Clear existing assignments
+      state.grid.forEach((slot) => {
+        slot.assignedPlayerId = undefined;
+      });
+
+      // Get available players grouped by position
+      const availablePlayersByPosition = {
+        Goalkeeper: state.players.filter((p) => p.position === "Goalkeeper"),
+        Defender: state.players.filter((p) => p.position === "Defender"),
+        Midfielder: state.players.filter((p) => p.position === "Midfielder"),
+        Forward: state.players.filter((p) => p.position === "Forward"),
+      };
+
+      console.log(availablePlayersByPosition);
+
+      // Position mapping for grid slots to player positions
+      const positionMapping: Record<string, string> = {
+        GK: "Goalkeeper",
+        LB: "Defender",
+        CB: "Defender",
+        RB: "Defender",
+        LWB: "Defender",
+        RWB: "Defender",
+        CDM: "Midfielder",
+        CM: "Midfielder",
+        CAM: "Midfielder",
+        LM: "Midfielder",
+        RM: "Midfielder",
+        ST: "Forward",
+        LW: "Forward",
+        RW: "Forward",
+      };
+
+      // Track used players
+      const usedPlayerIds = new Set<string>();
+      console.log(usedPlayerIds);
+
+      // Auto-assign players to grid slots
+      state.grid.forEach((slot) => {
+        const requiredPosition = positionMapping[slot.position];
+        if (requiredPosition) {
+          const availablePlayers =
+            availablePlayersByPosition[
+              requiredPosition as keyof typeof availablePlayersByPosition
+            ];
+          const unassignedPlayer = availablePlayers.find(
+            (p) => !usedPlayerIds.has(p.id)
+          );
+
+          if (unassignedPlayer) {
+            slot.assignedPlayerId = unassignedPlayer.id;
+            usedPlayerIds.add(unassignedPlayer.id);
+          }
+        }
+      });
+    },
   },
 });
 
-export const { assignPlayerToSlot, removePlayerFromSlot, resetLineup, setFormation } =
+export const { assignPlayerToSlot, removePlayerFromSlot, resetLineup, setFormation, loadLineup, autoAssign } =
   lineupSlice.actions;
 export default lineupSlice.reducer;
