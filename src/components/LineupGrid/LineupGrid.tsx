@@ -26,9 +26,9 @@ export default function LineupGrid() {
   }
 
   return (
-    <div className="w-full border border-yellow-500 overflow-clip">
+    <div className="flex-1 flex flex-col border border-yellow-500 overflow-hidden">
       {/* Formation selector above the grid */}
-      <div className="mb-4">
+      <div className="mb-4 p-4">
         <select onChange={handleFormationChange} className="p-2 rounded border">
           {Object.keys(formations).map((f) => (
             <option key={f} value={f}>
@@ -42,13 +42,13 @@ export default function LineupGrid() {
         style={{
           background: "linear-gradient(135deg, #228B22 80%, #006400 100%)",
           width: "100%",
-          height: "60%",
+          // height: "60%", 
           display: "grid",
           gridTemplateRows: "repeat(4, 1fr)",
           gridTemplateColumns: "repeat(5, 1fr)",
           gap: "16px",
           alignItems: "center",
-          justifyItems: "center",
+          justifyItems: "center", 
           border: "4px solid #fff",
           boxShadow: "0 0 24px #228B22",
         }}

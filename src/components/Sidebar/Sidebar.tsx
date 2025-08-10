@@ -31,18 +31,22 @@ export default function Sidebar() {
     <div
     // @ts-ignore
       ref={drop}
-      className={`w-1/4 h-full bg-white p-4 rounded shadow border border-red-500 flex flex-col transition-colors ${
+      className={`w-1/4 min-w-80 bg-white rounded shadow border border-red-500 flex flex-col transition-colors ${
         isOver ? "bg-red-50 border-red-400" : ""
       }`}
     >
-      <h2 className="text-lg font-semibold mb-2">
-        Available Players
-        {isOver && <span className="text-red-600 ml-2">(Drop to remove)</span>}
-      </h2>
-      <div className="space-y-2 flex-1 overflow-y-auto">
-        {unassignedPlayers.map((player) => (
-          <PlayerCard key={player.id} player={player} />
-        ))}
+      <div className="p-4 border-b border-gray-200">
+        <h2 className="text-lg font-semibold">
+          Available Players
+          {isOver && <span className="text-red-600 ml-2">(Drop to remove)</span>}
+        </h2>
+      </div>
+      <div className="flex-1 overflow-y-auto p-4">
+        <div className="space-y-2">
+          {unassignedPlayers.map((player) => (
+            <PlayerCard key={player.id} player={player} />
+          ))}
+        </div>
       </div>
     </div>
   );
