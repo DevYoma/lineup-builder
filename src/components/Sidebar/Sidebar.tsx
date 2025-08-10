@@ -29,6 +29,7 @@ export default function Sidebar() {
 
   return (
     <div
+    // @ts-ignore
       ref={drop}
       className={`w-1/4 h-full bg-white p-4 rounded shadow border border-red-500 flex flex-col transition-colors ${
         isOver ? "bg-red-50 border-red-400" : ""

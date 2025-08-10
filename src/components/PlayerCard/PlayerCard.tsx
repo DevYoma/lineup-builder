@@ -1,4 +1,3 @@
-import React from "react";
 import type { Player } from "../../types/types";
 import { useDrag } from "react-dnd";
 
@@ -18,6 +17,7 @@ export default function PlayerCard({ player }: Props) {
 
   return (
     <div
+      // @ts-ignore
       ref={drag}
       className="bg-blue-500 text-white p-2 rounded shadow cursor-pointer hover:bg-blue-600 transition"
       style={{ opacity: isDragging ? 0.5 : 1 }}

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import Sidebar from "./components/Sidebar/Sidebar";
 import Controls from "./components/Controls/Controls";
 import LineupGrid from "./components/LineupGrid/LineupGrid";
